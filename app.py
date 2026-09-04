@@ -22,7 +22,68 @@ st.markdown(
     [data-testid="stHeader"] {
         background: transparent;
     }
+    [data-testid="stAppDeployButton"] {
+        display: none !important;
+    }
+       [data-testid="stWidgetLabel"] p {
+    color: #e2e8f0 !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+}
 
+[data-testid="stRadio"] {
+    width: 100% !important;
+}
+
+[data-testid="stRadio"] [data-testid="stWidgetLabel"] {
+    display: none !important;
+}
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 24px !important;
+}
+[data-testid="stRadio"] [data-testid="stWidgetLabel"] p {
+    width: 100% !important;
+    text-align: center !important;
+}
+[data-testid="stRadio"] div[role="radiogroup"] {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 48px !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+
+        div[role="radiogroup"] label {
+        min-width: 260px;
+        padding: 16px 24px;
+        border: 2px solid #64748b;
+        border-radius: 16px;
+        background: #111c35;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    div[role="radiogroup"] label:hover {
+        border-color: #38bdf8;
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
+        transform: translateY(-3px);
+    }
+
+    div[role="radiogroup"] label p {
+        color: #ffffff !important;
+        font-size: 21px !important;
+        font-weight: 900 !important;
+    }
+
+    div[role="radiogroup"] label:has(input:checked) {
+        border-color: #fbbf24;
+        background: linear-gradient(135deg, #17345f, #312e81);
+        box-shadow: 0 0 24px rgba(251, 191, 36, 0.35);
+    }
     .block-container {
         max-width: 1500px;
         padding-top: 3rem;
@@ -119,6 +180,26 @@ students["GT2 Total"] = students[
 ].sum(axis=1)
 
 students["Change"] = students["GT2 Total"] - students["GT1 Total"]
+# College GT Percentile and batch rank calculations.
+# All 10 dummy students appeared in both tests.
+for test_name in ["GT1", "GT2"]:
+    total_column = f"{test_name} Total"
+    percentile_column = f"{test_name} College GT Percentile"
+    rank_column = f"{test_name} Batch Rank"
+
+    students[percentile_column] = (
+        students[total_column].rank(method="max", pct=True) * 100
+    ).round(1)
+
+    students[rank_column] = (
+        students[total_column].rank(method="min", ascending=False).astype(int)
+    )
+
+students["Percentile Change"] = (
+    students["GT2 College GT Percentile"]
+    - students["GT1 College GT Percentile"]
+).round(1)
+
 students["Distance from 180"] = 180 - students["GT2 Total"]
 
 total_students = len(students)
@@ -153,49 +234,620 @@ def show_card(title, value, colour, note=""):
 
 
 st.markdown(
-    '<div style="width:100%;margin:0 auto 26px;text-align:center;">'
-    '<div style="color:#7dd3fc;font-size:52px;font-weight:950;'
-    'letter-spacing:0.04em;text-shadow:0 0 20px rgba(56,189,248,0.55);">'
-    'VISHRA JUNIOR COLLEGE</div>'
-    '<div style="color:white;font-size:25px;font-weight:850;'
-    'margin-top:7px;">BALAPUR, HYDERABAD</div>'
-    '<div style="display:inline-block;margin-top:17px;padding:10px 24px;'
-    'border-radius:14px;background:#111c35;border:1px solid #a78bfa;'
-    'color:#c4b5fd;font-size:23px;font-weight:900;">'
-    'NK JEE - PERFORMANCE MONITORING SYSTEM<br><span style="font-size:18px;color:white;">DEMO</span></div></div>',
+"""<style>
+@keyframes collegeFade {
+0% {
+    opacity: 0;
+    transform: translateY(-12px);
+}
+100% {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+.nk-college {
+    animation: collegeFade 1.2s ease-out both;
+}
+</style>
+
+<div style="width:100%;margin:0 auto 26px;text-align:center;">
+<div class="nk-college" style="color:#7dd3fc;font-size:52px;font-weight:950;letter-spacing:0.04em;text-shadow:0 0 20px rgba(56,189,248,0.55);">VISHRA JUNIOR COLLEGE</div>
+<div style="color:white;font-size:25px;font-weight:850;margin-top:7px;">BALAPUR, HYDERABAD</div>
+<div style="display:inline-block;margin-top:17px;padding:10px 24px;border-radius:14px;background:#111c35;border:1px solid #a78bfa;color:#c4b5fd;font-size:23px;font-weight:900;">NK JEE - PERFORMANCE MONITORING SYSTEM<br></div>
+</div>""",
+    unsafe_allow_html=True,
+)
+st.markdown(
+"""<style>
+@keyframes purposeFade {
+0% {
+    opacity: 0;
+transform: translateY(6px);}
+100% {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+.purpose-animate {
+animation: purposeFade 0.8s ease-out 0.2s both;}
+</style>""",
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    '<div style="margin:10px 0 28px;padding:22px 28px;border-radius:20px;'
-    'background:#111c35;border:1px solid #38bdf8;text-align:center;'
-    'box-shadow:0 0 22px rgba(56,189,248,0.16);">'
-    '<div style="color:#7dd3fc;font-size:27px;font-weight:950;margin-bottom:14px;">PURPOSE OF THIS SYSTEM</div>'
-    '<div style="color:white;font-size:19px;line-height:1.9;">'
-    '1. See where the batch and each student stand after every test.<br>'
-    '2. Identify who needs attention and how many marks each student needs to reach 180.<br>'
-    '3. Help teachers guide students to improve their scores and strengthen their chances of NIT admission.'
-    '</div></div>',
-    unsafe_allow_html=True,
-)
-st.subheader('V1: "WHERE IS MY STUDENT?"')
 
 st.markdown(
-    '<div style="margin:20px 0 34px;padding:24px 30px;border-radius:22px;'
-    'background:#080b12;border:2px solid #fbbf24;'
-    'box-shadow:0 0 30px rgba(251,191,36,0.30);text-align:center;">'
-    '<div style="color:white;font-size:24px;font-weight:850;">OUR TARGET FOR EVERY STUDENT</div>'
-    '<div style="color:#fbbf24;font-size:54px;font-weight:950;'
-    'text-shadow:0 0 16px #f59e0b;">180 / 300</div>'
-    '<div style="color:#fde68a;font-size:21px;font-weight:800;">'
-            'OUR COLLEGE WORKING TARGET</div>'
-    '<div style="color:#cbd5e1;font-size:16px;margin-top:7px;">'
-    'Our planning target — not an official cutoff or seat guarantee.</div>'
+    """
+    <style>
+    @keyframes targetFade {
+        0% {
+            opacity: 0;
+            transform: scale(0.96);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .target-animate {
+        animation: targetFade 0.8s ease-out 0.3s both;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+st.markdown(
+    """
+    <div style="
+        margin:18px auto 26px;
+        padding:20px 28px;
+        max-width:900px;
+        text-align:center;
+        background:linear-gradient(135deg,#111c35,#25205a);
+       border:2px solid #fbbf24;
+        border-radius:22px;
+       box-shadow:0 0 32px rgba(251,191,36,0.38);
+    ">
+        <div style="
+           color:#fde68a;
+            font-size:42px;
+            font-weight:950;
+            letter-spacing:1px;
+            text-shadow:0 0 18px rgba(251,191,36,0.75);
+        ">
+            ✨ SELECT DASHBOARD VIEW ✨
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+selector_left, selector_middle, selector_right = st.columns([1.2, 3, 0.8])
+with selector_middle:
+    st.markdown(
+        '<div style="width:100%;text-align:center;color:#e2e8f0;'
+        'font-size:18px;font-weight:800;margin-bottom:24px;">'
+        'CHOOSE HOW YOU WANT TO VIEW STUDENT PERFORMANCE'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    dashboard_view = st.radio(
+        "Dashboard view",
+        ["MARKS VIEW", "PERCENTILE VIEW"],
+        format_func=lambda view: {
+            "MARKS VIEW": "📊 MARKS VIEW",
+            "PERCENTILE VIEW": "📈 PERCENTILE VIEW",
+        }[view],
+        horizontal=True,
+        key="dashboard_view",
+        label_visibility="collapsed",
+    )
+st.markdown(
+    '<div style="margin:10px 0 26px;padding:15px 22px;border-radius:16px;'
+    'background:#111c35;border:1px solid #818cf8;text-align:center;'
+    'color:#e2e8f0;font-size:18px;font-weight:800;">'
+    '<b style="color:#38bdf8;">MARKS VIEW</b> shows the student’s score. '
+    '<b style="color:#c4b5fd;">PERCENTILE VIEW</b> shows the student’s '
+    'position within the college batch.'
     '</div>',
     unsafe_allow_html=True,
 )
+if dashboard_view == "PERCENTILE VIEW":
+    percentile_improved = int((students["Percentile Change"] > 0).sum())
+    percentile_declined = int((students["Percentile Change"] < 0).sum())
+    percentile_stable = int((students["Percentile Change"] == 0).sum())
 
-st.markdown("## 1. GT1 TO GT2 — WHAT CHANGED?")
+    st.markdown("## COLLEGE GT PERCENTILE")
+
+    st.markdown(
+        '<div style="margin:14px 0 24px;padding:22px 26px;border-radius:20px;'
+        'background:#111c35;border:2px solid #a78bfa;text-align:center;">'
+        '<div style="color:#c4b5fd;font-size:23px;font-weight:950;">'
+        'COLLEGE GT PERCENTILE FORMULA</div>'
+        '<div style="color:white;font-size:22px;font-weight:850;'
+        'line-height:1.7;margin-top:12px;">'
+        '100 × (Number of appeared students scoring equal to or below '
+        'the student) ÷ Total number of students who appeared'
+        '</div></div>',
+        unsafe_allow_html=True,
+    )
+
+    percentile_columns = st.columns(4)
+
+    with percentile_columns[0]:
+        show_card(
+            "STUDENTS APPEARED",
+            total_students,
+            "#38bdf8",
+            "included in percentile calculation",
+        )
+
+    with percentile_columns[1]:
+        show_card(
+            "PERCENTILE IMPROVED",
+            percentile_improved,
+            "#22c55e",
+            "GT1 to GT2",
+        )
+
+    with percentile_columns[2]:
+        show_card(
+            "PERCENTILE STABLE",
+            percentile_stable,
+            "#fbbf24",
+            "GT1 to GT2",
+        )
+
+    with percentile_columns[3]:
+        show_card(
+            "PERCENTILE DECLINED",
+            percentile_declined,
+            "#ef4444",
+            "GT1 to GT2",
+        )
+
+    st.markdown(
+        '<div style="margin:24px 0;padding:18px 24px;border-radius:18px;'
+        'background:#2b2108;border:1px solid #fbbf24;text-align:center;">'
+        '<div style="color:#fde68a;font-size:18px;font-weight:850;">'
+        'College GT Percentile is based on the students who appeared '
+        'in this test. It is not the official NTA percentile.'
+        '</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown("### 📈 GT1 TO GT2 — COLLEGE GT PERCENTILE MOVEMENT")
+
+    gt2_bar_colors = [
+        "#22c55e" if change > 0
+        else "#ef4444" if change < 0
+        else "#fbbf24"
+        for change in students["Percentile Change"]
+    ]
+
+    percentile_fig = go.Figure()
+
+    percentile_fig.add_trace(
+        go.Bar(
+            name="GT1 Percentile",
+            x=students["Student"],
+            y=students["GT1 College GT Percentile"],
+            marker_color="#64748b",
+            text=students["GT1 College GT Percentile"],
+            textposition="outside",
+        )
+    )
+
+    percentile_fig.add_trace(
+        go.Bar(
+            name="GT2 Percentile",
+                        showlegend=False,
+            x=students["Student"],
+            y=students["GT2 College GT Percentile"],
+            marker_color=gt2_bar_colors,
+            text=students["GT2 College GT Percentile"],
+            textposition="outside",
+        )
+    )
+    for legend_name, legend_color in [
+        ("GT2 Improved", "#22c55e"),
+        ("GT2 Stable", "#fbbf24"),
+        ("GT2 Declined", "#ef4444"),
+    ]:
+        percentile_fig.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(
+                    symbol="square",
+                    size=14,
+                    color=legend_color,
+                ),
+                name=legend_name,
+            )
+        )
+    percentile_fig.add_hline(
+        y=90,
+        line_color="#38bdf8",
+        line_dash="dash",
+        annotation_text="90+ PERCENTILE",
+        annotation_font_color="#38bdf8",
+    )
+
+    percentile_fig.update_layout(
+        barmode="group",
+        height=520,
+                xaxis=dict(
+            title=dict(
+                text="STUDENTS",
+                font=dict(color="#38bdf8", size=18),
+            ),
+            tickfont=dict(color="#e2e8f0", size=14),
+        ),
+        yaxis=dict(
+            title=dict(
+                text="COLLEGE GT PERCENTILE",
+                font=dict(color="#38bdf8", size=18),
+            ),
+            tickfont=dict(color="#e2e8f0", size=14),
+            range=[0, 110],
+        ),
+        paper_bgcolor="#080b12",
+        plot_bgcolor="#111c35",
+        font_color="#ffffff",
+        legend_title_text="",
+                legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.10,
+            xanchor="center",
+            x=0.5,
+            font=dict(color="#ffffff", size=16),
+            bgcolor="rgba(0,0,0,0)",
+        ),
+        margin=dict(t=90, b=40, l=40, r=40),
+    )
+
+    st.plotly_chart(
+        percentile_fig,
+        use_container_width=True,
+        config={
+            "displayModeBar": False,
+            "displaylogo": False,
+        },
+    )
+
+    st.markdown("## 👤 INDIVIDUAL STUDENT PERCENTILE ANALYSIS")
+
+    selected_percentile_student = st.selectbox(
+        "SELECT A STUDENT",
+        students["Student"].tolist(),
+        key="percentile_student_selector",
+    )
+
+    selected_percentile_data = students.loc[
+        students["Student"] == selected_percentile_student
+    ].iloc[0]
+
+    gt1_percentile = int(selected_percentile_data["GT1 College GT Percentile"])
+    gt2_percentile = int(selected_percentile_data["GT2 College GT Percentile"])
+    percentile_change = int(selected_percentile_data["Percentile Change"])
+    gt1_rank = int(selected_percentile_data["GT1 Batch Rank"])
+    gt2_rank = int(selected_percentile_data["GT2 Batch Rank"])
+    gt1_marks = int(selected_percentile_data["GT1 Total"])
+    gt2_marks = int(selected_percentile_data["GT2 Total"])
+    marks_change = gt2_marks - gt1_marks
+    gt1_distance_from_target = 180 - gt1_marks
+    gt2_distance_from_target = 180 - gt2_marks
+    if marks_change > 0:
+        marks_movement_color = "#22c55e"
+        marks_movement_status = "INCREASED"
+    elif marks_change < 0:
+        marks_movement_color = "#ef4444"
+        marks_movement_status = "DECREASED"
+    else:
+        marks_movement_color = "#fbbf24"
+        marks_movement_status = "UNCHANGED"
+    if marks_change > 0:
+        marks_change_message = f"Marks increased by {marks_change}."
+    elif marks_change < 0:
+        marks_change_message = f"Marks decreased by {abs(marks_change)}."
+    else:
+        marks_change_message = "Marks remained unchanged."
+
+    if gt2_distance_from_target > 0:
+            target_distance_message = (
+                f"{selected_percentile_student} is currently "
+                f"{gt2_distance_from_target} marks short of the 180 target."
+            )
+    elif gt2_distance_from_target < 0:
+        target_distance_message = (
+                f"{selected_percentile_student} is currently "
+                f"{abs(gt2_distance_from_target)} marks above the 180 target."
+            )
+    else:
+        target_distance_message = (
+                f"{selected_percentile_student} has exactly reached "
+                "the 180 target."
+            )
+
+    marks_target_summary = (
+        f"{marks_change_message} {target_distance_message}"
+    )
+    if percentile_change > 0:
+        percentile_status = "IMPROVED"
+        status_color = "#22c55e"
+        status_icon = "📈"
+    elif percentile_change < 0:
+        percentile_status = "DECLINED"
+        status_color = "#ef4444"
+        status_icon = "📉"
+    else:
+        percentile_status = "STABLE"
+        status_color = "#fbbf24"
+        status_icon = "➡️"
+    if percentile_change > 0:
+        percentile_reason = (
+            f"{selected_percentile_student}'s percentile increased by "
+            f"{percentile_change} points, and the batch rank moved from "
+            f"{gt1_rank} to {gt2_rank}. The student performed better "
+            "relative to the appeared students in GT2."
+        )
+    elif percentile_change < 0:
+        percentile_reason = (
+            f"{selected_percentile_student}'s percentile decreased by "
+            f"{abs(percentile_change)} points, and the batch rank moved from "
+            f"{gt1_rank} to {gt2_rank}. The student's relative position "
+            "among the appeared students declined in GT2."
+        )
+    else:
+        percentile_reason = (
+            f"{selected_percentile_student}'s percentile remained unchanged "
+            f"at {gt2_percentile}. The student's relative position among "
+            "the appeared students remained stable."
+        )
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMetric"] {
+            background: #111c35;
+            border: 1px solid #64748b;
+            border-radius: 16px;
+            padding: 20px;
+                        text-align: center;
+        }
+
+        [data-testid="stMetricLabel"] p {
+        color: #38bdf8 !important;
+        font-size: 22px !important;
+            font-weight: 850 !important;
+        }
+
+        [data-testid="stMetricValue"] {
+        color: #fbbf24 !important;
+        font-size: 52px !important;
+        font-weight: 900 !important;
+        }
+
+        [data-testid="stMetricDelta"] {
+            color: #cbd5e1 !important;
+        }
+                [data-testid="stMetricLabel"],
+        [data-testid="stMetricDelta"] {
+            justify-content: center !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    analysis_col1, analysis_col2, analysis_col3 = st.columns(3)
+
+    with analysis_col1:
+        st.metric(
+            "GT1 PERCENTILE",
+            gt1_percentile,
+            f"Batch Rank: {gt1_rank}",
+            delta_color="off",
+        )
+
+    with analysis_col2:
+        st.metric(
+            "GT2 PERCENTILE",
+            gt2_percentile,
+            f"Batch Rank: {gt2_rank}",
+            delta_color="off",
+        )
+
+    with analysis_col3:
+        st.metric(
+            f"{status_icon} STATUS",
+            percentile_status,
+            f"{percentile_change:+d} percentile",
+            delta_color="off",
+        )
+    st.markdown(
+        f"""
+        <div style="
+            margin: 24px 0 10px;
+            padding: 20px 24px;
+            background: #111c35;
+            border: 1px solid {status_color};
+            border-left: 7px solid {status_color};
+            border-radius: 16px;
+            box-shadow: 0 0 20px {status_color}33;
+        ">
+            <div style="
+                color: {status_color};
+                font-size: 21px;
+                font-weight: 900;
+                margin-bottom: 10px;
+            ">
+                🔍 WHY THE PERCENTILE CHANGED
+            </div>
+            <div style="
+                color: #ffffff;
+                font-size: 19px;
+                font-weight: 650;
+                line-height: 1.6;
+            ">
+                {percentile_reason}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"## 📊 {selected_percentile_student.upper()} — COLLEGE PERCENTILE MOVEMENT"
+    )
+
+    individual_percentile_fig = go.Figure()
+
+    individual_percentile_fig.add_trace(
+        go.Scatter(
+            x=["GT1", "GT2"],
+            y=[gt1_percentile, gt2_percentile],
+            mode="lines+markers+text",
+            line=dict(color=status_color, width=5),
+            marker=dict(
+                color=[ "#64748b", status_color ],
+                size=18,
+                line=dict(color="#ffffff", width=2),
+            ),
+            text=[gt1_percentile, gt2_percentile],
+            textposition="top center",
+            textfont=dict(color="#ffffff", size=20),
+            hovertemplate="<b>%{x}</b><br>College Percentile: %{y}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    individual_percentile_fig.update_layout(
+        height=400,
+        paper_bgcolor="#080b12",
+        plot_bgcolor="#111c35",
+        margin=dict(l=60, r=40, t=45, b=55),
+        xaxis=dict(
+            title="TEST",
+            tickfont=dict(color="#ffffff", size=17),
+            title_font=dict(color="#38bdf8", size=18),
+        ),
+        yaxis=dict(
+            title="COLLEGE GT PERCENTILE",
+            range=[0, 105],
+            tickfont=dict(color="#e2e8f0", size=14),
+            title_font=dict(color="#38bdf8", size=18),
+            gridcolor="#64748b",
+        ),
+        font=dict(color="#ffffff"),
+    )
+
+    st.plotly_chart(
+        individual_percentile_fig,
+        use_container_width=True,
+        config={
+            "displayModeBar": False,
+            "displaylogo": False,
+        },
+    )
+    st.markdown(
+        f"## 🎯 {selected_percentile_student.upper()} — MARKS PROGRESS TOWARDS 180"
+    )
+    individual_marks_fig = go.Figure()
+
+    individual_marks_fig.add_trace(
+        go.Bar(
+            x=["GT1", "GT2"],
+            y=[gt1_marks, gt2_marks],
+            marker_color=["#64748b", marks_movement_color],
+            text=[gt1_marks, gt2_marks],
+            textposition="outside",
+            textfont=dict(color="#ffffff", size=20),
+            width=[0.42, 0.42],
+            hovertemplate="<b>%{x}</b><br>Total Marks: %{y}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    individual_marks_fig.add_hline(
+        y=180,
+        line_color="#fbbf24",
+        line_width=3,
+        line_dash="dash",
+        annotation_text="180 MARKS TARGET",
+        annotation_position="top right",
+        annotation_font_color="#fbbf24",
+        annotation_font_size=16,
+    )
+
+    individual_marks_fig.update_layout(
+        height=460,
+        paper_bgcolor="#080b12",
+        plot_bgcolor="#111c35",
+        margin=dict(l=60, r=40, t=45, b=55),
+        xaxis=dict(
+            title="TEST",
+            tickfont=dict(color="#ffffff", size=17),
+            title_font=dict(color="#38bdf8", size=18),
+        ),
+        yaxis=dict(
+            title="TOTAL MARKS OUT OF 300",
+            range=[0, 210],
+            tickfont=dict(color="#e2e8f0", size=14),
+            title_font=dict(color="#38bdf8", size=18),
+            gridcolor="#64748b",
+        ),
+        font=dict(color="#ffffff"),
+    )
+
+    st.plotly_chart(
+        individual_marks_fig,
+        use_container_width=True,
+        config={
+            "displayModeBar": False,
+            "displaylogo": False,
+        },
+    )
+
+    st.markdown(
+        f"""
+        <div style="
+            margin: 14px 0 10px;
+            padding: 18px 24px;
+            background: #111c35;
+            border: 1px solid {marks_movement_color};
+            border-left: 7px solid {marks_movement_color};
+            border-radius: 15px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 750;
+            line-height: 1.5;
+            text-align: center;
+        ">
+            🎯 {marks_target_summary}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.stop()
+if dashboard_view == "MARKS VIEW":
+    st.markdown(
+        '<div style="margin:18px 0 32px;padding:24px 28px;border-radius:22px;'
+        'background:#080b12;border:2px solid #fbbf24;'
+        'box-shadow:0 0 30px rgba(251,191,36,0.30);text-align:center;">'
+        '<div style="color:#fde68a;font-size:23px;font-weight:900;">'
+        'COLLEGE WORKING MARKS TARGET</div>'
+        '<div class="target-animate" style="color:#fbbf24;font-size:56px;'
+        'font-weight:950;text-shadow:0 0 16px #f59e0b;">180 / 300</div>'
+        '<div style="color:#cbd5e1;font-size:16px;margin-top:6px;">'
+        'Our planning target — not an official cutoff or seat guarantee.</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("## 1. GT1 TO GT2 — WHAT CHANGED?")
 
 st.markdown(
     '<div style="margin:10px 0 22px;padding:16px 22px;border-radius:16px;'
