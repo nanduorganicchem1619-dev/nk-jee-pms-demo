@@ -521,14 +521,84 @@ if dashboard_view == "PERCENTILE VIEW":
             "displaylogo": False,
         },
     )
+    achievers_90 = students.loc[
+        students["GT2 College GT Percentile"] >= 90,
+        [
+            "Student",
+            "GT1 College GT Percentile",
+            "GT2 College GT Percentile",
+        ],
+    ].copy()
 
+    achievers_90 = achievers_90.sort_values(
+        "GT2 College GT Percentile",
+        ascending=False,
+    )
+
+    st.markdown("### 🏆 90+ COLLEGE GT PERCENTILE ACHIEVERS")
+
+    if achievers_90.empty:
+        st.info("No student achieved 90+ College GT Percentile in GT2.")
+    else:
+                achievers_table_html = """
+        <style>
+        .achievers-table {
+            margin-top: 18px;
+            margin-bottom: 28px;
+        }
+        .achievers-table table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .achievers-table th {
+            background-color: #fbbf24;
+            color: #081426;
+            font-size: 18px;
+            font-weight: 800;
+            padding: 14px;
+            text-align: center;
+        }
+        .achievers-table td {
+            background-color: #111c38;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 600;
+            padding: 14px;
+            text-align: center;
+            border-top: 1px solid #465a7a;
+        }
+        .achievers-table tbody tr:nth-child(even) td {
+            background-color: #18264a;
+        }
+        </style>
+        <div class="achievers-table">
+        """ + achievers_90.to_html(index=False, border=0) + """
+        </div>
+        """
+
+                st.html(achievers_table_html)
     st.markdown("## 👤 INDIVIDUAL STUDENT PERCENTILE ANALYSIS")
 
-    selected_percentile_student = st.selectbox(
-        "SELECT A STUDENT",
-        students["Student"].tolist(),
-        key="percentile_student_selector",
-    )
+    selector_left, selector_center, selector_right = st.columns([3, 2, 3])
+
+    with selector_center:
+        st.markdown(
+            "<div style='text-align:center; font-size:26px; "
+            "font-weight:800; color:#ffffff; margin-bottom:8px;'>"
+            "SELECT A STUDENT</div>",
+            unsafe_allow_html=True,
+        )
+
+        selected_percentile_student = st.selectbox(
+            "SELECT A STUDENT",
+            students["Student"].tolist(),
+            key="percentile_student_selector",
+            label_visibility="collapsed",
+        )
 
     selected_percentile_data = students.loc[
         students["Student"] == selected_percentile_student
@@ -580,36 +650,43 @@ if dashboard_view == "PERCENTILE VIEW":
         f"{marks_change_message} {target_distance_message}"
     )
     if percentile_change > 0:
-        percentile_status = "IMPROVED"
-        status_color = "#22c55e"
-        status_icon = "📈"
+            percentile_status = "IMPROVED"
+            status_color = "#22c55e"
+            status_icon = "📈"
     elif percentile_change < 0:
-        percentile_status = "DECLINED"
-        status_color = "#ef4444"
-        status_icon = "📉"
+            percentile_status = "DECLINED"
+            status_color = "#ef4444"
+            status_icon = "📉"
     else:
-        percentile_status = "STABLE"
-        status_color = "#fbbf24"
-        status_icon = "➡️"
+            percentile_status = "STABLE"
+            status_color = "#fbbf24"
+            status_icon = "➡️"
+
     if percentile_change > 0:
         percentile_reason = (
-            f"{selected_percentile_student}'s percentile increased by "
-            f"{percentile_change} points, and the batch rank moved from "
-            f"{gt1_rank} to {gt2_rank}. The student performed better "
-            "relative to the appeared students in GT2."
+            f"{selected_percentile_student}'s "
+            f"{marks_change_message.lower()} "
+            f"The College GT Percentile increased from {gt1_percentile} "
+            f"to {gt2_percentile}. "
+            f"{selected_percentile_student}'s position in the batch improved from rank {gt1_rank} "
+            f"to rank {gt2_rank}."
         )
     elif percentile_change < 0:
         percentile_reason = (
-            f"{selected_percentile_student}'s percentile decreased by "
-            f"{abs(percentile_change)} points, and the batch rank moved from "
-            f"{gt1_rank} to {gt2_rank}. The student's relative position "
-            "among the appeared students declined in GT2."
+            f"{selected_percentile_student}'s "
+            f"{marks_change_message.lower()} "
+            f"The College GT Percentile decreased from {gt1_percentile} "
+            f"to {gt2_percentile} because other students improved more. "
+            f"{selected_percentile_student}'s position in the batch moved down from rank {gt1_rank} "
+            f"to rank {gt2_rank}."
         )
     else:
         percentile_reason = (
-            f"{selected_percentile_student}'s percentile remained unchanged "
-            f"at {gt2_percentile}. The student's relative position among "
-            "the appeared students remained stable."
+            f"{selected_percentile_student}'s "
+            f"{marks_change_message.lower()} "
+            f"The College GT Percentile remained stable at {gt2_percentile}. "
+            f"{selected_percentile_student}'s rank in the batch was {gt1_rank} in GT1 "
+            f"and {gt2_rank} in GT2."
         )
     st.markdown(
         """
@@ -665,7 +742,7 @@ if dashboard_view == "PERCENTILE VIEW":
 
     with analysis_col3:
         st.metric(
-            f"{status_icon} STATUS",
+            f"{status_icon} PERCENTILE STATUS",
             percentile_status,
             f"{percentile_change:+d} percentile",
             delta_color="off",
@@ -687,7 +764,7 @@ if dashboard_view == "PERCENTILE VIEW":
                 font-weight: 900;
                 margin-bottom: 10px;
             ">
-                🔍 WHY THE PERCENTILE CHANGED
+                🔍 PERCENTILE EXPLANATION
             </div>
             <div style="
                 color: #ffffff;
@@ -1061,10 +1138,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-selected_student_name = st.selectbox(
-    "SELECT STUDENT",
-    students["Student"].tolist(),
-)
+marks_selector_left, marks_selector_center, marks_selector_right = st.columns([3, 2, 3])
+
+with marks_selector_center:
+    st.markdown(
+        "<div style='text-align:center; font-size:30px; "
+        "font-weight:800; color:#ffffff; margin-bottom:8px;'>"
+        "SELECT A STUDENT</div>",
+        unsafe_allow_html=True,
+    )
+
+    selected_student_name = st.selectbox(
+        "SELECT A STUDENT",
+        students["Student"].tolist(),
+        key="marks_student_selector",
+        label_visibility="collapsed",
+    )
 
 selected_student = students[
     students["Student"] == selected_student_name
@@ -1411,7 +1500,7 @@ st.markdown(
     'WHICH ROUTE IS BEST FOR ANANYA?</div>'
     '<div style="color:#fbbf24;font-size:31px;font-weight:950;margin-top:8px;">'
     'WHICH ROUTE IS BEST FOR RAHUL?</div>'
-    '<div style="color:white;font-size:26px;font-weight:900;margin-top:20px;">'
+    '<div style="color:white;font-size:30px;font-weight:900;margin-top:20px;">'
     'BEST ROUTE IN V1: NOT DECIDED</div>'
     '<div style="color:#fde68a;font-size:18px;margin-top:10px;">'
     'V1 shows the gap and example routes. It does not have enough evidence '
