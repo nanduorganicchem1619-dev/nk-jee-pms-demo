@@ -1319,7 +1319,7 @@ lowest_subjects = [
 
 if highest_change > 0:
         if len(highest_subjects) == 3:
-            helped_text = f"ALL 3 SUBJECTS +{highest_change}"
+            helped_text = f"ALL 3 SUBJECTS<br>+{highest_change}"
         else:
             helped_text = " and ".join(highest_subjects)
             helped_text = f"{helped_text}<br>+{highest_change}"
