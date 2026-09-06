@@ -940,7 +940,7 @@ comparison_columns = st.columns(4)
 
 with comparison_columns[0]:
     show_card(
-        "GT1 — FIRST-TEST AVERAGE",
+"GT1 — FIRST-TEST<br>AVERAGE",
         f"{gt1_average:.1f}",
         "#94a3b8",
         "Average total of all 10 students",
@@ -948,7 +948,7 @@ with comparison_columns[0]:
 
 with comparison_columns[1]:
     show_card(
-        "GT2 — LATEST-TEST AVERAGE",
+       "GT2 — LATEST-TEST<br>AVERAGE",
         f"{gt2_average:.1f}",
         "#38bdf8",
         "Average total of all 10 students",
@@ -956,7 +956,7 @@ with comparison_columns[1]:
 
 with comparison_columns[2]:
     show_card(
-        "BATCH IMPROVED BY",
+       "BATCH IMPROVED<br>BY",
         f"+{batch_improvement:.1f}",
         "#22c55e",
         "marks from GT1 to GT2",
@@ -964,7 +964,7 @@ with comparison_columns[2]:
 
 with comparison_columns[3]:
     show_card(
-        "STUDENTS REACHING 180",
+        "STUDENTS REACHING<br>180",
         f"{gt1_reached_180} → {gt2_reached_180}",
         "#fbbf24",
         "GT1 → GT2",
@@ -986,8 +986,7 @@ st.markdown(
     '<div style="margin:10px 0 22px;padding:15px 22px;border-radius:16px;'
     'background:#111c35;border:1px solid #64748b;text-align:center;'
     'color:#e2e8f0;font-size:18px;">'
-    'The three student groups below add up to all 10 students.'
-    '</div>',
+'All 10 students are divided into the three groups shown below.'    '</div>',
     unsafe_allow_html=True,
 )
 
@@ -1193,12 +1192,12 @@ lowest_subject = min(subject_changes, key=subject_changes.get)
 lowest_change = subject_changes[lowest_subject]
 
 if best_change > 0:
-    helped_text = f"{best_subject} +{best_change}"
+           helped_text = f"{best_subject}<br>+{best_change}"
 else:
     helped_text = "No subject increased"
 
 if lowest_change < 0:
-    reduced_text = f"{lowest_subject} {lowest_change}"
+           reduced_text = f"{lowest_subject}<br>{lowest_change}"
 else:
     reduced_text = "No subject decreased"
 
@@ -1263,7 +1262,9 @@ maths_colour = "#22c55e" if maths_change > 0 else (
     "#ef4444" if maths_change < 0 else "#94a3b8"
 )
 
+st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
 st.markdown("### SUBJECT-WISE MARKS")
+st.markdown("<div style='height:32px;'></div>", unsafe_allow_html=True)
 
 subject_columns = st.columns(3)
 
@@ -1321,15 +1322,15 @@ if highest_change > 0:
             helped_text = f"ALL 3 SUBJECTS +{highest_change}"
         else:
             helped_text = " and ".join(highest_subjects)
-            helped_text = f"{helped_text} +{highest_change}"
+            helped_text = f"{helped_text}<br>+{highest_change}"
 else:
-    helped_text = "No subject increased"
+    helped_text = "No subject increased<br>&nbsp;"
 
 if lowest_change < 0:
     reduced_text = " and ".join(lowest_subjects)
-    reduced_text = f"{reduced_text} {lowest_change}"
+    reduced_text = f"{reduced_text}<br>{lowest_change}"
 else:
-    reduced_text = "No subject decreased"
+    reduced_text = "No subject decreased<br>&nbsp;"
 student_columns_2 = st.columns(2)
 
 with student_columns_2[0]:
@@ -1462,6 +1463,7 @@ for route_column, route in zip(first_route_row, example_routes[:4]):
             unsafe_allow_html=True,
         )
 
+st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
 second_route_row = st.columns(3)
 
 for route_column, route in zip(second_route_row, example_routes[4:]):
